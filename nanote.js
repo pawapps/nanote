@@ -89,7 +89,6 @@ var gen_charsets = function() {
     // Sort charsets so shortests charsets are at the beginning
     charsets = charsets.sort(function(a,b) { return a.length - b.length; });
     console.log('Generated ' + charsets.length + ' charsets');
-    console.log(charsets);
     return charsets;
 }
 
