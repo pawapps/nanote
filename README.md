@@ -11,6 +11,10 @@ Send short messages in the Nano currency protocol
 
 ## Usage
 
+### Node.js
+
+See example [here](tree/master/examples/nodejs)
+
     var Nanote = require('nanote');
 
     var nanote = new Nanote(verbose=true);
@@ -21,6 +25,15 @@ Send short messages in the Nano currency protocol
     var decoded = nanote.decode(encoded);
     // hello, world!
 
+### Client Side (via Browserify)
+
+See example [here](tree/master/examples/client_side)
+
+    var encoded = nanote.encode('hello, world!');
+    // 0.000010047688408466530337461894
+
+    var decoded = nanote.decode(encoded);
+    // hello, world!
 
 ## Tests
 
