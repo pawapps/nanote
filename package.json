@@ -1,0 +1,30 @@
+{
+  "name": "nanote",
+  "version": "0.1.0",
+  "description": "Encode and decode short messages in the Nano currency protocol",
+  "main": "nanote.js",
+  "scripts": {
+    "test": "mocha --reporter spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/pawapps/nanote.git"
+  },
+  "keywords": [
+    "Nano",
+    "cryptocurrency",
+    "message",
+    "note",
+    "steganography"
+  ],
+  "author": "Jason Pawlak",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pawapps/nanote/issues"
+  },
+  "homepage": "https://github.com/pawapps/nanote#readme",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0"
+  }
+}
