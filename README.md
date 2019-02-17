@@ -1,6 +1,8 @@
 Nanote
 =========
 
+[![Build Status](https://travis-ci.org/pawapps/nanote.svg?branch=master)](https://travis-ci.org/pawapps/nanote)
+
 Send short messages in the Nano currency protocol
 
 ## Installation
