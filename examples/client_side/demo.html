@@ -1,0 +1,46 @@
+<html>
+<head>
+
+<title>Nanote</title>
+
+<script>
+
+function go()
+{
+    plaintext = document.getElementById('in').value;
+    encoded = nanote.encode(plaintext);
+    if (!encoded)
+    {
+        encoded = '';
+        decoded = '';
+        charset = 'No charset found!';
+    } else {
+        decoded = nanote.decode(encoded);
+        charset = nanote.charsets[nanote.shortest_charset(plaintext)];
+    }
+    document.getElementById('encoded').innerHTML = encoded;
+    document.getElementById('decoded').innerHTML = decoded;
+    document.getElementById('charset').innerHTML = charset;
+
+}
+
+</script>
+
+</head>
+
+<body onload="go();">
+
+<input type="text" id="in" onkeyup="go();"><br>
+Charset in use: <span id="charset"></span><br>
+Nano value: <span id="encoded"></span><br>
+Decoded string: <span id="decoded"></span>
+
+<!--
+Generated with Browserify
+browserify index.js > bundle.js
+-->
+<script src="bundle.js"></script>
+
+</body>
+
+</html>
