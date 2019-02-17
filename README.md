@@ -3,8 +3,6 @@
 [![npm version](https://img.shields.io/npm/v/nanote.svg)](https://www.npmjs.com/package/nanote)
 [![Build Status](https://travis-ci.org/pawapps/nanote.svg?branch=master)](https://travis-ci.org/pawapps/nanote)
 
-=========
-
 Send short messages in the Nano currency protocol
 
 ## Installation
@@ -18,10 +16,10 @@ Send short messages in the Nano currency protocol
     var nanote = new Nanote(verbose=true);
 
     var encoded = nanote.encode('hello, world!');
+    // 0.000010047688408466530337461894
 
     var decoded = nanote.decode(encoded);
-  
-  `decoded` should be `hello, world!`
+    // hello, world!
 
 
 ## Tests

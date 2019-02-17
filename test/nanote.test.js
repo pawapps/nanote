@@ -1,7 +1,7 @@
 'use strict';
 
 const expect = require('chai').expect;
-const Nanote = require('../nanote');
+const Nanote = require('../src/nanote');
 
 describe('Nanote', function() {
 
