@@ -25,7 +25,7 @@ See example [here](examples/nodejs)
     var decoded = nanote.decode(encoded);
     // hello, world!
 
-### Client Side (via Browserify)
+### Client Side (via [Browserify](https://github.com/browserify/browserify#example))
 
 See example [here](examples/client_side)
 

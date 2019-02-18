@@ -1,6 +1,6 @@
 'use strict';
 
-// Nanote v0.1.0
+// Nanote v0.1.1
 // Jason Pawlak
 // https://www.github.com/pawapps/nanote
 
@@ -174,11 +174,19 @@ class Nanote {
     /**
      * Decodes Nano value string into plaintext string
      * @param {string} nano value as string
-     * @return {string} plaintext decoded string
+     * @return {string} plaintext decoded string. false if error.
      */
     decode(nano)
     {
-        var charset_index = Number(nano.slice(this.charset_index_length*-1));
+        // Input validation
+        if (nano.match(/^\d+\.\d{30}/) == null) {
+            return false;
+        }
+        try {
+            var charset_index = Number(nano.slice(this.charset_index_length*-1));
+        } catch(err) {
+            return false;
+        }
         if (this.verbose) { console.log('Decoding with charset (' + charset_index + '): ' + this.charsets[charset_index]); }
 
         // Format Nano value string to quotient

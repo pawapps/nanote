@@ -65,6 +65,11 @@ describe('Nanote', function() {
             var encoded = nanote.encode(valid_chars);
             expect(nanote.decode(encoded)).to.be.a('string');
         });
+
+        it('should return false when invalid input is given', function() {
+
+            expect(nanote.decode('\\')).to.be.equal(false);
+        });
     });
 
     describe('#b10encode()', function() {
