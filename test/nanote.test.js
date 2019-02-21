@@ -66,6 +66,12 @@ describe('Nanote', function() {
             expect(nanote.decode(encoded)).to.be.a('string');
         });
 
+        it('should return false when decoding value smaller than the minimal raw', function() {
+
+            var encoded = nanote.encode(valid_chars);
+            expect(nanote.decode('0.000000000000000000000000012345')).to.be.equal(false);
+        });
+
         it('should return false when invalid input is given', function() {
 
             expect(nanote.decode('\\')).to.be.equal(false);

@@ -195,6 +195,10 @@ class Nanote {
         quotient = BigInt(quotient);
         quotient = quotient - (this.minimum_raw/BigInt(10**this.charset_index_length));    // remove minimum_raw (divide charset_index_length
                                                                                 // because quotient was shifted right)
+        if (quotient < 0) {
+            // nano input was not larger than the minimum raw
+            return false;
+        }
         var plaintext = this.b10decode(BigInt(quotient), this.charsets[charset_index]);
 
         return plaintext;
