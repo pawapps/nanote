@@ -1,6 +1,6 @@
 'use strict';
 
-// Nanote v0.1.1
+// Nanote - send notes with Nano
 // Jason Pawlak
 // https://www.github.com/pawapps/nanote
 
