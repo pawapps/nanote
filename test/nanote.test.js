@@ -118,6 +118,31 @@ describe('Nanote', function() {
         });
     });
 
+    describe('#encode_raw()', function() {
+
+        it('should return false when unsupported character is given', function() {
+
+            expect(nanote.encode_raw('\\')).to.be.equal(false);
+            expect(nanote.encode_raw('^')).to.be.equal(false);
+            expect(nanote.encode_raw('A')).to.be.equal(false);
+        });
+
+        it('should return string when valid characters given', function() {
+
+            expect(nanote.encode_raw(valid_chars)).to.be.a('string');
+        });
+
+        it('should return amount that matches expected output format', function() {
+
+            expect(nanote.encode_raw('a')).to.match(/^\d{31,}/);
+        });
+
+        it('should return correct output', function() {
+            expect(nanote.encode_raw('e')).to.be.equal('0000100000000000000000000020001');
+            expect(nanote.encode_raw('hello, world!')).to.be.equal('0000100476884084665303374618942');
+        });
+    });
+
     describe('#decode()', function() {
 
         it('should return string when valid characters given', function() {
@@ -128,7 +153,6 @@ describe('Nanote', function() {
 
         it('should return false when decoding value smaller than the minimal raw', function() {
 
-            var encoded = nanote.encode(valid_chars);
             expect(nanote.decode('0.000000000000000000000000011114')).to.be.equal(false);
         });
 
@@ -144,6 +168,38 @@ describe('Nanote', function() {
 
         it('should return correct output', function() {
             expect(nanote.decode('0.000100000000000000000000020001')).to.be.equal('e');
+        });
+    });
+
+    describe('#decode_raw()', function() {
+        it('should return string when valid characters given', function() {
+
+            var encoded = nanote.encode(valid_chars);
+            encoded = encoded.replace('.', '');
+            expect(nanote.decode_raw(encoded)).to.be.a('string');
+        });
+
+        it('should return false when decoding value smaller than the minimal raw', function() {
+
+            expect(nanote.decode_raw('11114')).to.be.equal(false);
+            expect(nanote.decode_raw('0000000000000000000000000011114')).to.be.equal(false);
+        });
+
+        it('should return false when invalid input is given', function() {
+
+            expect(nanote.decode_raw('')).to.be.equal(false);
+            expect(nanote.decode_raw('123')).to.be.equal(false);
+            expect(nanote.decode_raw('\\')).to.be.equal(false);
+            expect(nanote.decode_raw('^')).to.be.equal(false);
+            expect(nanote.decode('A')).to.be.equal(false);
+            expect(nanote.decode_raw(true)).to.be.equal(false);
+            expect(nanote.decode_raw(false)).to.be.equal(false);
+            expect(nanote.decode_raw(12345)).to.be.equal(false);
+        });
+
+        it('should return correct output', function() {
+            expect(nanote.decode_raw('0000100000000000000000000020001')).to.be.equal('e');
+            expect(nanote.decode_raw('100000000000000000000020001')).to.be.equal('e');
         });
     });
 

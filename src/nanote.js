@@ -184,13 +184,23 @@ class Nanote {
             return false;
         }
         nano = nano + checksum;     // Set checksum
-        // var nano = this.calculate_checksum(String(charset_index));
-        // nano = String(charset_index).padStart(this.charset_index_length, '0');   // Set charset index
-        // nano = String(quotient) + nano;                     // Set encoded string
         nano = nano.padStart(31, '0');                      // Ensure leading zeros
         nano = nano.slice(0, -30) + '.' + nano.slice(-30);  // Add decimal
      
         return nano;
+    }
+
+    /**
+     * Encodes plaintext string into Nano raw value
+     * @param {string} plaintext string to encode
+     * @return {string} formatted string as Nano raw value.  false if error
+     */
+    encode_raw(plaintext) {
+        var nano = this.encode(plaintext);
+        if (nano == false) {
+            return false;
+        }
+        return nano.replace('.', '');
     }
 
     /**
@@ -238,6 +248,29 @@ class Nanote {
         var plaintext = this.b10decode(BigInt(quotient), this.charsets[charset_index]);
 
         return plaintext;
+    }
+
+    /**
+     * Decodes raw amount of Nano into plaintext string
+     * @param {string} nano raw value as string
+     * @return {string} plaintext decoded string. false if error
+     */
+    decode_raw(raw)
+    {
+        // Input validation
+        if (typeof raw != 'string') {
+            if (this.verbose) { console.error('Failed to decode due to non string input'); }
+            return false;
+        }
+        if (raw.length <= (this.charset_index_length + 1)) {
+            // +1 for checksum
+            if (this.verbose) { console.error('Failed to decode due to too short of string length'); }
+            return false;
+        }
+
+        var nano = raw.padStart(31, '0');                   // Ensure leading zeros
+        nano = nano.slice(0, -30) + '.' + nano.slice(-30);  // Add decimal
+        return this.decode(nano);
     }
 
     /**
