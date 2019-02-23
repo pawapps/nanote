@@ -4,50 +4,6 @@
 // Jason Pawlak
 // https://www.github.com/pawapps/nanote
 
-////
-// Protocol
-//  0.000000000000000000000000000 000
-//  base 10 encoded string        charset index
-//
-//  Character Set Index:
-//   This three digit index represents the set of characters that were used
-//   to encode the string.  Using the smallest set of characters is what
-//   lets the user create the longest string possible for minimal value.
-//
-//  Encoded String:
-//   The value of the encoded string is dependent on the character set
-//   used and the length of the string.  There are no protocol limitations
-//   on the length of the decoded string, only the total supply of Nano
-//   or the balance of your sending account.
-//
-//  Minimum value is added to value to ensure receive block is created
-//
-//  How it works:
-//   1. A string of characters is given for encoding
-//   2. The shortest character set to cover the string is found
-//   3. Each character in the string has a value assigned to it
-//      based on the character set selected.
-//   4. The string values are encoded in base 10
-//   5. The standardized character set index is appended to the
-//      encoded string
-//   6. A minimum value is added to the resulting value.  This is
-//      to ensure normal wallets will create a receive block.  Most
-//      wallets have a minimum receive to block small transaction spam.
-//   7. Send a Nano transaction with the resulting value and the
-//      receiver can decode the value to reveal the message.
-//
-//  Implementation:
-//   This library simply gives a value for a transaction.  How
-//   transactions are sent, received, and tracked is up to the
-//   implementation.  Simply decoding all blocks on the Nano network
-//   will give lots of messages that were not encoded with Nanote.
-//   Some possible implementations...
-//   - Monitor an account in which all transactions are encoded
-//     messages.  Decode each block sent/received by that account.
-//   - Monitor a representative account so that all transactions
-//     with that representative are decoded.  This would be similar
-//     to a chat channel.
-
 /**
  * Generates the character sets
  */
@@ -97,10 +53,9 @@ class Nanote {
     constructor(verbose=false) {
 
         this.charsets = gen_charsets();
-        this.minimum_raw = 10000000000000000000000000n;    // 0.00001 Nano
+        this.minimum_raw = 100000000000000000000000000n;    // 0.0001 Nano
         this.charset_index_length = 3;
         this.verbose = verbose;
-
     }
 
     /**
@@ -144,15 +99,68 @@ class Nanote {
     }
 
     /**
+     * Calculates the checksum of given string of digits
+     * checksum = ( sum(digits) + 1 ) % 10
+     * @param {string} string of digits
+     * @return {string} checksum value as string. false if error.
+     */
+    calculate_checksum(digits) {
+        // Validate input
+        if (typeof digits != 'string') {
+            return false;
+        }
+        if (!digits.match(/^\d+$/)) {
+            return false;
+        }
+        var sum = 0;
+        for (var digit of digits) {
+            sum = sum + Number(digit);
+        }
+
+        sum++;
+        return String(sum % 10);
+    }
+
+    /**
+     * Validates the given checksum for given digits
+     * @param {string} digits to calculate checksum
+     * @param {string} expected checksum value
+     * @return {boolean} true if valid, false if not valid
+     */
+    validate_checksum(digits, checksum) {
+        // Validate input
+        if (typeof digits != 'string') {
+            return false;
+        }
+        if (typeof checksum != 'string') {
+            return false;
+        }
+        if (!checksum.match(/^\d$/)) {
+            return false;
+        }
+        if (this.calculate_checksum(digits) == checksum) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Encodes plaintext string in Nano value
      * @param {string} plaintext string to encode
      * @return {string} formatted string as Nano value. false if error.
      */
     encode(plaintext) {
+        // input validation
+        if (typeof plaintext != 'string') {
+            if (this.verbose) { console.error('Failed to encode due to non string input'); }
+            return false;
+        }
+
         var charset_index = this.shortest_charset(plaintext);
         if (charset_index == -1)
         {
             // No charset found
+            if (this.verbose) { console.error('Failed to encode due to no available charset'); }
             return false;
         }
         if (this.verbose) { console.log('Encoding with charset (' + charset_index + '): ' + this.charsets[charset_index]); }
@@ -160,11 +168,21 @@ class Nanote {
         var quotient = this.b10encode(plaintext, this.charsets[charset_index]);
 
         // Format Nano value string
-        quotient = quotient + (this.minimum_raw/BigInt(10**this.charset_index_length));    // Add minimum_raw (divide charset_index_length
+        quotient = quotient + (this.minimum_raw/BigInt(10**(this.charset_index_length+1)));    // Add minimum_raw (divide charset_index_length+1
                                                                                 // because quotient is shifted left to
-                                                                                // allow charset index)
-        var nano = String(charset_index).padStart(this.charset_index_length, '0');   // Set charset index
-        nano = String(quotient) + nano;                     // Set encoded string
+                                                                                // allow charset index and checksum)
+        
+        var nano = String(quotient);                                                    // Set encoded string
+        nano = nano + String(charset_index).padStart(this.charset_index_length, '0');   // Set charset index
+        var checksum = this.calculate_checksum(String(charset_index));                  // Set checksum
+        if (checksum == false) {
+            if (this.verbose) { console.error('Failed to encode due to failed checksum calculation'); }
+            return false;
+        }
+        nano = nano + checksum;     // Set checksum
+        // var nano = this.calculate_checksum(String(charset_index));
+        // nano = String(charset_index).padStart(this.charset_index_length, '0');   // Set charset index
+        // nano = String(quotient) + nano;                     // Set encoded string
         nano = nano.padStart(31, '0');                      // Ensure leading zeros
         nano = nano.slice(0, -30) + '.' + nano.slice(-30);  // Add decimal
      
@@ -179,24 +197,38 @@ class Nanote {
     decode(nano)
     {
         // Input validation
+        if (typeof nano != 'string') {
+            if (this.verbose) { console.error('Failed to decode due to non string input'); }
+            return false;
+        }
         if (nano.match(/^\d+\.\d{30}/) == null) {
+            if (this.verbose) { console.error('Failed to decode due to regex mismatch'); }
             return false;
         }
         try {
-            var charset_index = Number(nano.slice(this.charset_index_length*-1));
+            var checksum = nano.slice(-1,);
+            var charset_index = Number(nano.slice((this.charset_index_length*-1)-1, -1));
         } catch(err) {
+            if (this.verbose) { console.error('Failed to decode due to amount parsing exception'); }
             return false;
         }
+        if (this.validate_checksum(String(charset_index), checksum) == false) {
+            if (this.verbose) { console.error('Failed to decode due to invalid checksum'); }
+            return false;
+        }
+
         if (this.verbose) { console.log('Decoding with charset (' + charset_index + '): ' + this.charsets[charset_index]); }
 
         // Format Nano value string to quotient
         var quotient = nano.replace('.', '');                                   // remove decimal
-        quotient = quotient.slice(0, this.charset_index_length*-1);             // remove charset
+        quotient = quotient.slice(0, -1)                                        // remove checksum
+        quotient = quotient.slice(0, (this.charset_index_length*-1));           // remove charset index
         quotient = BigInt(quotient);
-        quotient = quotient - (this.minimum_raw/BigInt(10**this.charset_index_length));    // remove minimum_raw (divide charset_index_length
-                                                                                // because quotient was shifted right)
+        quotient = quotient - (this.minimum_raw/BigInt(10**(this.charset_index_length+1)));    // remove minimum_raw (divide charset_index_length+1
+                                                                                // and checksum length because quotient was shifted right)
         if (quotient < 0) {
             // nano input was not larger than the minimum raw
+            if (this.verbose) { console.error('Failed to decode due to amount not being larger than the minimum raw'); }
             return false;
         }
         var plaintext = this.b10decode(BigInt(quotient), this.charsets[charset_index]);
