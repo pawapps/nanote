@@ -23,8 +23,8 @@ describe('Nanote', function() {
 
     describe('#constructor()', function() {
 
-        it('should reference charsets that contain no more than 1000 sets', function() {
-            expect(nanote.charsets.length).to.be.below(1001);
+        it('should reference charsets that contain 1000 sets', function() {
+            expect(nanote.charsets.length).to.be.equal(1000);
         });
     });
 
