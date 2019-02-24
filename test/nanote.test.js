@@ -19,6 +19,7 @@ describe('Nanote', function() {
         var decoded = nanote.decode(encoded);
         console.log('decoded: ' + decoded);
         expect(decoded).to.be.equal(valid_chars);
+        expect(nanote.decode(nanote.encode('k'))).to.be.equal('k');
     });
 
     describe('#constructor()', function() {

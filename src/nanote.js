@@ -179,7 +179,7 @@ class Nanote {
         var nano = String(quotient);                                                    // Set encoded string
         nano = nano + String(charset_index).padStart(this.charset_index_length, '0');   // Set charset index
         var checksum = this.calculate_checksum(String(charset_index));                  // Set checksum
-        if (checksum == false) {
+        if (checksum === false) {
             if (this.verbose) { console.error('Failed to encode due to failed checksum calculation'); }
             return false;
         }
@@ -197,7 +197,7 @@ class Nanote {
      */
     encode_raw(plaintext) {
         var nano = this.encode(plaintext);
-        if (nano == false) {
+        if (nano === false) {
             return false;
         }
         return nano.replace('.', '');
@@ -226,7 +226,7 @@ class Nanote {
             if (this.verbose) { console.error('Failed to decode due to amount parsing exception'); }
             return false;
         }
-        if (this.validate_checksum(String(charset_index), checksum) == false) {
+        if (this.validate_checksum(String(charset_index), checksum) === false) {
             if (this.verbose) { console.error('Failed to decode due to invalid checksum'); }
             return false;
         }
