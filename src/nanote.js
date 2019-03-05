@@ -160,6 +160,10 @@ class Nanote {
             return false;
         }
 
+        // Prepend space. This space acts as a checksum for discerning nanote messages.
+        // A space is the "least expensive" character
+        plaintext = ' '+plaintext;
+
         var charset_index = this.shortest_charset(plaintext);
         if (charset_index == -1)
         {
@@ -246,6 +250,13 @@ class Nanote {
             return false;
         }
         var plaintext = this.b10decode(BigInt(quotient), this.charsets[charset_index]);
+
+        // Check that the first character is a space, as required by the protocol, and then strip it.
+        if (plaintext[0] !== ' ') {
+            if (this.verbose) { console.error('Failed to decode due to decoded string not beginning with a space character'); }
+            return false;
+        }
+        plaintext = plaintext.slice(1,);
 
         return plaintext;
     }

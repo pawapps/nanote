@@ -112,8 +112,8 @@ describe('Nanote', function() {
         });
 
         it('should return correct output', function() {
-            expect(nanote.encode('e')).to.be.equal('0.000100000000000000000000020001');
-            expect(nanote.encode('hello, world!')).to.be.equal('0.000100476884084665303374618942');
+            expect(nanote.encode('e')).to.be.equal('0.000100000000000000000000140001');
+            expect(nanote.encode('hello, world!')).to.be.equal('0.000102182701366461085457178942');
             // Including this just to make updating documentation easier
             console.log('encode("hello, world!") is ' + nanote.encode('hello, world!'));
         });
@@ -139,8 +139,8 @@ describe('Nanote', function() {
         });
 
         it('should return correct output', function() {
-            expect(nanote.encode_raw('e')).to.be.equal('0000100000000000000000000020001');
-            expect(nanote.encode_raw('hello, world!')).to.be.equal('0000100476884084665303374618942');
+            expect(nanote.encode_raw('e')).to.be.equal('0000100000000000000000000140001');
+            expect(nanote.encode_raw('hello, world!')).to.be.equal('0000102182701366461085457178942');
         });
     });
 
@@ -157,6 +157,11 @@ describe('Nanote', function() {
             expect(nanote.decode('0.000000000000000000000000011114')).to.be.equal(false);
         });
 
+        it('should return false when decoded string does not begin with a space', function() {
+
+            expect(nanote.decode('0.000100476884084665303374618942')).to.be.equal(false);
+        });
+
         it('should return false when invalid input is given', function() {
 
             expect(nanote.decode('\\')).to.be.equal(false);
@@ -168,7 +173,7 @@ describe('Nanote', function() {
         });
 
         it('should return correct output', function() {
-            expect(nanote.decode('0.000100000000000000000000020001')).to.be.equal('e');
+            expect(nanote.decode('0.000100000000000000000000140001')).to.be.equal('e');
         });
     });
 
@@ -199,8 +204,8 @@ describe('Nanote', function() {
         });
 
         it('should return correct output', function() {
-            expect(nanote.decode_raw('0000100000000000000000000020001')).to.be.equal('e');
-            expect(nanote.decode_raw('100000000000000000000020001')).to.be.equal('e');
+            expect(nanote.decode_raw('0000100000000000000000000140001')).to.be.equal('e');
+            expect(nanote.decode_raw('100000000000000000000140001')).to.be.equal('e');
         });
     });
 

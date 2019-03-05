@@ -8,7 +8,7 @@ console.log('Plaintext: ' + plaintext);
 
 var encoded = nanote.encode(plaintext);
 console.log('Encoded: ' + encoded);
-// Encoded: 0.000010047688408466530337461894
+// Encoded: 0.000102182701366461085457178942
 
 var decoded = nanote.decode(encoded);
 console.log('Decoded: ' + decoded);
